@@ -2,7 +2,8 @@
 
 square_for <- function(x){
   # [ToDo] Use the for loop
-
+  square = x^2
+  return(square)
 }
 
 square_sapply <- function(x){
