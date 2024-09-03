@@ -7,7 +7,7 @@ require(mnormt) # for multivariate normal data generation
 # beta - supplied discriminant vector
 # xtrain, ytrain - training data
 # xtest, ytest - testing data
-#
+# xtrain and xtest are matrices with p columns, and ytrain and ytest are vectors, labels are 1 and 2
 # OUTPUT
 # ypred - predicted class membership
 # error - percent of misclassified observations
@@ -16,12 +16,23 @@ classify_for <- function(beta, xtrain, ytrain, xtest, ytest){
   # [ToDo] Code discriminant analysis classifier using for loop
   
   # Calculate sample means based on training data
-  
+  xbar1 = colMeans(xtrain[ytrain == 1, ]) # drop = FALSE
+  xbar2 = colMeans(xtrain[ytrain == 2, ])
   
   # Calculate class assignments for xtest in a for loop
-  
+  npred = nrow(xtest)
+  ypred = rep(1, npred)
+  for (i in 1:npred) {
+    # use h(x) rule to predict 
+    # h1 = xtest[i, ,drop = FALSE]%*%beta 
+    h1 = as.numeric(crossprod((xtest[i, ] - xbar1), beta)^2) # (xtest[i, ] - xbar1)^T beta
+    h2 = as.numeric(crossprod((xtest[i, ] - xbar2), beta)^2)
+    if (h2 < h1) {
+      ypred[i] = 2
+    }
+  }
   # Calculate % error using ytest
-  
+  error = 100*mean(ypred != ytest) # sum(ypred != ytest) / npred
   # Return predictions and error
   return(list(ypred = ypred, error = error))
 }
@@ -30,8 +41,17 @@ classify_vec <- function(beta, xtrain, ytrain, xtest, ytest){
   # [ToDo] Try to create vectorized version of classify_for
   
   # Calculate sample means based on training data
+  xbar1 = colMeans(xtrain[ytrain == 1, ]) # drop = FALSE
+  xbar2 = colMeans(xtrain[ytrain == 2, ])
+  
+  # Calculate the inner product of the means with beta
+  m1b = as.numeric(crossprod(xbar1, beta))
+  m2b = as.numeric(crossprod(xbar2, beta))
   
   # Calculate class assignments for xtest using matrix and vector algebra
+  xtestb = xtest%*%beta
+  h1 = (xtestb - m1b)^2
+  h2 = (xtestb - m2b)^2
   
   # Calculate % error using ytest
   
