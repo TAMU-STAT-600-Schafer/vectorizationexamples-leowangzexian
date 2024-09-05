@@ -54,7 +54,8 @@ classify_vec <- function(beta, xtrain, ytrain, xtest, ytest){
   h2 = (xtestb - m2b)^2
   
   # Calculate % error using ytest
-  
+  ypred = as.numeric((h2 < h1) + 1) # ifelse()
+  error = 100*mean(ypred != ytest)
   # Return predictions and error
   return(list(ypred = ypred, error = error))
 }
@@ -100,7 +101,7 @@ out1 = classify_for(beta, xtrain, ytrain, xtest, ytest)
 out2 = classify_vec(beta, xtrain, ytrain, xtest, ytest)
 
 # [ToDo] Verify the assignments agree with each other
-
+testthat::expect_equal(out1, out2) # testthat::expect_equivalent
 # [ToDo] Use microbenchmark package to compare the timing
-
 library(microbenchmark)
+microbenchmark(classify_for(beta, xtrain, ytrain, xtest, ytest), classify_vec(beta, xtrain, ytrain, xtest, ytest))
